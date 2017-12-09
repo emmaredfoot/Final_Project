@@ -27,20 +27,20 @@ public:
     //int bunnies[];
 
 public:
-
     //Default Constructor
-    Bunny(double x){}
+    Bunny();
 
     // Bunny()
-    // :next(NULL),
-    // color("none"),
-    // gender("none"),
-    // name("none"),
-    // age(0),
-    // mutant(0)
-    // {}
+    // {
+    //     color = "none";
+    //     gender = "none";
+    //     name = "none";
+    //     age=0;
+    //     mutant = false;
+    //     next = NULL;
+    // }
     //Destructor
-    ~Bunny();
+    //~Bunny();
 
     string getGender(double x);
 
@@ -60,10 +60,10 @@ public:
 
 };
 
-struct node {
-    int data;
-    node *next;
-};
+// struct node {
+//     int data;
+//     node *next;
+// };
 
 class BunnyList {
 public:

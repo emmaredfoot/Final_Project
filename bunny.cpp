@@ -134,7 +134,10 @@ bool Bunny::getMutant(double x){
 }
 
 //Bunny constructor
-Bunny::Bunny(double x){
+Bunny::Bunny() {
+    double x;
+    numCalls++;
+    x=randlcg(numCalls);
     cout << numCalls << endl;
     gender = getGender(x);
     color = getColor(x);
@@ -174,13 +177,10 @@ void Bunny::printBunny()
     cout << "Living? " << living << endl;
 }
 
-
 int main(){
 
-double x;
-x=randlcg(numCalls);
+Bunny instanceBun;
 
-Bunny instanceBun = new Bunny(x);
 instanceBun.printBunny();
 //instanceBun.incrementAge(Bunny* start);
 
