@@ -27,7 +27,6 @@ double randlcg(int numCalls) {
 int numCalls =0;
 int MaxBunAge = 10;
 int MaxMutantAge = 50;
-
 Bunny BunnyArray[5000];
 
 string Bunny::getGender(double x){
@@ -135,34 +134,50 @@ bool Bunny::getMutant(double x){
 
 //Bunny constructor
 Bunny::Bunny() {
-    double x;
     numCalls++;
-    x=randlcg(numCalls);
-    cout << numCalls << endl;
+    double x = randlcg(numCalls);
+    cout << "x=" << x << endl;
     gender = getGender(x);
     color = getColor(x);
     name = getName(x);
     bool mutant = getMutant(x);
     bool living = true;
-
+    printBunny();
 }
 
+//BunnyList constructor
+BunnyList::BunnyList(): head(NULL), size(0){}
+
 //New Bunny birth after the original 10
-void BunnyList::AddBun(Bunny* Bun){
-    int males = 0;
-    int females = 0;
-    int population = 0;
-    //
+void BunnyList::AddBun(){
+    Bunny* newBun = new Bunny;
+
+    if (!head){
+        head = newBun;
+    }
+    else{
+        Bunny* temp = head;
+        while(temp->next !=NULL){
+            temp -> next = newBun;
+        }
+    }
+    ++size;
 }
 
 //Track Bunny age. Have to start at the beginning of the list of bunnies and add 1 to each. The ones that have died
 //I need to remove from the list
-void Bunny::incrementAge(Bunny* start){
-    while (start != NULL)
-    {
-        //Use a pointer to access the age characteristic in the bunny type
-        start->age = start->age+1;
-        start = start->next;
+void BunnyList::incrementAge(Bunny* start){
+    if(head){
+        Bunny* temp = head;
+        Bunny* other = NULL;
+
+        while (temp != NULL)
+        {
+
+            //Use a pointer to access the age characteristic in the bunny type
+            start->age = start->age+1;
+            start = start->next;
+        }
     }
 
 }
@@ -177,30 +192,37 @@ void Bunny::printBunny()
     cout << "Living? " << living << endl;
 }
 
+//Make initial 10 bunny list
+void BunnyList::OriginalList(int numCalls) {
+    cout << "numCalls" << numCalls << endl;
+    if(numCalls == 0)
+    {
+        for(int i=0; i<10; i++){
+            AddBun();
+        }
+    }
+
+}
+
+
 int main(){
-
 Bunny instanceBun;
+BunnyList * PeskyWabbits = new BunnyList;
 
-instanceBun.printBunny();
-//instanceBun.incrementAge(Bunny* start);
+int numCalls = 0;
+
+PeskyWabbits->OriginalList(numCalls);
+Bunny* start;
+
+PeskyWabbits->incrementAge(start);
 
 //initialize the first 10 bunnies
-// while(sizeof(OriginalBuns)<10){
-//     cout << numCalls << endl;
-//     double x;
-//     numCalls++;
-//
-//     //find the gender
-//     x=randlcg(numCalls);
-//     cout << x << endl;
-//     string gender = OriginalBuns.getGender(x);
-//     //find and assign the color
-//     string color = OriginalBuns.getColor(x);
-//
-//     //find and assign the name
-//     string name = OriginalBuns.getName(x);
-// }
-//
+while(numCalls<10){
+    cout << "here" << endl;
+    instanceBun.getMutant(0);
+    instanceBun.printBunny();
+}
+
 // double x=randlcg(numCalls);
 // numCalls++;
 //

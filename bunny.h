@@ -50,11 +50,9 @@ public:
 
     bool getMutant(double x);
 
-    void incrementAge(Bunny*);
+
 
     //Everything above here is the actual data going into the node.
-
-
 
     void printBunny();
 
@@ -68,12 +66,20 @@ public:
 class BunnyList {
 public:
     Bunny *head, *tail;
+    int size;
 
 public:
     //constructor
-    BunnyList(){head=NULL; tail=NULL;}
+    BunnyList();
     //Destructor
-    ~BunnyList();
+    //~BunnyList();
 
-    void AddBun(Bunny* Bun);
+    void OriginalList(int numCalls);
+
+    void BunnyPop(bool& terminate);
+
+    void incrementAge(Bunny*);
+
+    //bool BunnyAge(BunnyList* CurrentBunny);
+    void AddBun();
 };
