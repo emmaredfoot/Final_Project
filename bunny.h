@@ -16,7 +16,6 @@ public:
     string name;
     string color;
     bool mutant;
-    bool living;
     int age;
     //The next is a pointer to the next bunny in the linked list
     Bunny *next;
@@ -28,28 +27,37 @@ public:
 
 public:
     //Default Constructor
-    Bunny();
+    //Bunny();
 
-    // Bunny()
-    // {
-    //     color = "none";
-    //     gender = "none";
-    //     name = "none";
-    //     age=0;
-    //     mutant = false;
-    //     next = NULL;
-    // }
+    Bunny()
+    {
+        color = "none";
+        gender = "none";
+        name = "none";
+        age=0;
+        mutant = false;
+        next = NULL;
+    }
+
+    Bunny(double x);
     //Destructor
     //~Bunny();
 
-    string getGender(double x);
+    string setGender(double x);
 
-    string getColor(double x);
+    string getGender();
 
-    string getName(double x);
+    string setColor(double x);
 
-    bool getMutant(double x);
+    string setName(double x);
 
+    string getName();
+
+    int getAge();
+
+    bool setMutant(double x);
+
+    bool getMutant();
 
 
     //Everything above here is the actual data going into the node.
@@ -78,8 +86,16 @@ public:
 
     void BunnyPop(bool& terminate);
 
-    void incrementAge(Bunny*);
+    void incrementAge();
 
     //bool BunnyAge(BunnyList* CurrentBunny);
-    void AddBun();
+    void AddBun(double x);
+
+    void BunnyMates();
+
+    // void FemalePopulation();
+    //
+    // void MalePopulation();
+
+    void MutantPopulation();
 };
