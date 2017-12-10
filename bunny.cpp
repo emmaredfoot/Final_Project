@@ -2,15 +2,25 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <iostream>
 #include <math.h>
 #include <string>
 #include </Users/emmaredfoot/eclipse-workspace/Homework/Final_Project/bunny.h>
 using namespace std;
 
-//Bunny::Bunnylist(string gender, string name, string color, bool mutant, int age = 0) {}
+//Global Variables
+int numCalls =0;
+int MaxBunAge = 10;
+int MaxMutantAge = 50;
+int F_mate = 0;
+int F_pop = 0;
+int M_mate = 0;
+int M_pop = 0;
+int Mutants = 0;
+Bunny BunnyArray[5000];
 
-double randlcg(int numCalls) {
-    cout << "rand" << endl;
+double randlcg() {
+    //cout << "rand" << endl;
     numCalls++;
     long int lcg_array[1000000];
     double normalize;
@@ -21,17 +31,10 @@ double randlcg(int numCalls) {
     lcg_array[numCalls] = (lcg_array[numCalls-1]*g + c)%modulus;
     //cout << lcg_array[numCalls] << endl;
     normalize = double(lcg_array[numCalls])/modulus;
-    return normalize;
+    return(normalize);
 }
 
-//Global Variables
-int numCalls =0;
-int MaxBunAge = 10;
-int MaxMutantAge = 50;
-int F_pop = 0;
-int M_pop = 0;
-int Mutants = 0;
-Bunny BunnyArray[5000];
+
 
 string Bunny::setGender(double x){
     if (x < .49) {
@@ -151,6 +154,12 @@ bool Bunny::getMutant(){
 //Bunny constructor
 Bunny::Bunny(double x) {
     gender = setGender(x);
+    if (gender == "female"){
+        F_pop++;
+    }
+    if (gender == "male"){
+        M_pop++;
+    }
     color = setColor(x);
     name = setName(x);
     age = 0;
@@ -160,7 +169,10 @@ Bunny::Bunny(double x) {
     else{
         mutant = false;
     }
-
+    if(mutant){
+        Mutants++;
+    }
+    age = 0;
     printBunny();
 }
 
@@ -188,48 +200,61 @@ int Bunny::getAge(){
     return(age);
 }
 
+bool BunnyList::ageCheck(Bunny* current){
+    bool liveBun = current->getAge()<MaxBunAge && !(current->getMutant());
+    bool YoungMutant = current->getMutant() && current->getAge()<MaxMutantAge;
+    if (liveBun || YoungMutant){
+        return(1);
+    }
+    else{
+        return(0);
+    }
+}
 //Track Bunny age. Have to start at the beginning of the list of bunnies and add 1 to each. The ones that have died
 //I need to remove from the list
 void BunnyList::incrementAge(){
-    if(head){
-        cout << head << endl;
+    //cout << "here" << endl;
+    if(size){
+        //cout << "also" << endl;
         //For the head of the linked list,
         Bunny* temp = head;
         Bunny* other = NULL;
+
+        //test cases for all of the if statements
+        bool liveBun = temp->getAge()<MaxBunAge && !(temp->getMutant());
+        bool OldLadyBun = temp->getGender()=="female" && temp->getAge()>8;
+        bool OldManBun = temp->getGender() == "male" && temp->getAge()>8;
+        bool YoungMutant = temp->getMutant() && temp->getAge()<MaxMutantAge;
+        bool deadBun = temp->getAge()>=MaxBunAge && !(temp->getMutant());
+        bool FemaleCheck = temp -> getGender()=="female";
+        bool MaleCheck = temp -> getGender()=="male";
 
         //Loop through the entire BunnyList and add a year to the ages of the bunnies that qualify
         //kill off the bunnies that are too old
         while (temp != NULL) //At the end of the bunny list temp will be empty
         {
-            //Check to see if the bunny is less than 10 years old and not a mutant
-            if(temp->getAge()<MaxBunAge && !(temp->getMutant())){
-                cout << "gotcha" << endl;
+            //Check to see if the bunny is less than 10 years old and not a mutant or less than 50 and not a mutant
+            if(liveBun || YoungMutant){
+                cout << "determining failure " << temp->getAge() << endl;
                 //Add a year
                 temp->age+=1;
-                //rename temp so that we know the current Bunny evaluated and can then access the
-                //next bunny in the linked list
-                if (temp->getGender()=="female" && temp->getAge()>8){
-                    F_pop--;
-                    cout << "# females: " << F_pop << endl;
+                if (OldLadyBun){
+                    cout << "age " << temp->getAge() << endl;
+                    F_mate--;
+                    cout << "# females: " << F_mate << endl;
                 }
-                else if (temp -> getGender() == "male" && temp->getAge()>8){
-                    M_pop--;
-                    cout << "# males: " << F_pop << endl;
+                if (OldManBun){
+                    cout << "age " << temp->getAge() << endl;
+                    M_mate--;
+                    cout << "# males: " << M_mate << endl;
                 }
-                other = temp;
-                temp = temp->next;
-            }
-            //check to see if the bunny is a mutant and less than 50 years
-            else if(temp->getMutant() && temp->getAge()<MaxMutantAge){
-                //Add a year
-                temp->age+=1;
                 //rename temp so that we know the current Bunny evaluated and can then access the
                 //next bunny in the linked list
                 other = temp;
                 temp = temp->next;
             }
             //Check to see if the the bunny is 10 years old and not a mutant
-            else if(temp->getAge()>=MaxBunAge && !(temp->getMutant())){
+            else if(deadBun){
                 //Check if we are on the first node of the Bunny List
                 if(head==temp)
                 {
@@ -239,13 +264,26 @@ void BunnyList::incrementAge(){
                     delete temp;
                     //rename the next node as the front of the list
                     temp = head;
+                    if (FemaleCheck){
+                        F_pop--;
+                    }
+                    if (MaleCheck){
+                        M_pop--;
+                    }
                     size--;
 
                 }
                 else{
-                    other->next=temp->next;
+                    other->next= temp->next;
                     cout << temp->getName() << " died!" << endl;
+
                     //remove the node as the Bunny has died
+                    if (FemaleCheck){
+                        F_pop--;
+                    }
+                    if (MaleCheck){
+                        M_pop--;
+                    }
                     delete temp;
                     //rename the next node as the front of the list
                     temp = other -> next;
@@ -260,6 +298,14 @@ void BunnyList::incrementAge(){
                     head = temp -> next;
                     cout << temp->getName() << " the mutant bunny died!" << endl;
                     //remove the node as the Bunny has died
+                    if (FemaleCheck){
+                        F_pop--;
+                    }
+                    if (MaleCheck){
+                        M_pop--;
+                    }
+                    //Decreases the mutant population
+                    Mutants--;
                     delete temp;
                     //rename the next node as the front of the list
                     temp = head;
@@ -270,6 +316,13 @@ void BunnyList::incrementAge(){
                     other->next=temp->next;
                     cout << temp->getName() << " the mutant bunny died!" << endl;
                     //remove the node as the Bunny has died
+                    if (temp -> getGender()=="female"){
+                        F_pop--;
+                    }
+                    if (temp -> getGender()=="male"){
+                        M_pop--;
+                    }
+                    Mutants--;
                     delete temp;
                     //rename the next node as the front of the list
                     temp = other -> next;
@@ -292,44 +345,106 @@ void Bunny::printBunny()
     //cout << age << endl;
     cout << "Mutant = " << mutant << endl;
 
-    //save Bunny output to file
+    ofstream bunnyfile("bunny.txt", std::ios_base::app);
+    bunnyfile << "New Bunny \n";
+    bunnyfile << "gender=";
+    bunnyfile << gender;
+    bunnyfile << "\n";
+    bunnyfile << "color=";
+    bunnyfile << color;
+    bunnyfile << "\n";
+    bunnyfile << "name=";
+    bunnyfile << name;
+    bunnyfile << "\n";
+
 }
 
 //Make bunny list
-void BunnyList::OriginalList(int numCalls) {
-    while(numCalls < 10){
+void BunnyList::OriginalList() {
         numCalls++;
-        double x = randlcg(numCalls);
+        double x = randlcg();
         this->AddBun(x);
         cout << "x " << x << endl;
         cout << "numCalls: " << numCalls << endl;
+        this->incrementAge();
+}
+
+void BunnyList::BunnyMates(){
+    int new_buns = 0;
+    cout << "new Buns" << endl;
+    this->incrementAge();
+    cout << "Females " << F_mate << endl;
+    double x = randlcg();
+    if(head){
+        Bunny* temp = head;
+        while(temp !=NULL){
+            if(F_mate && M_mate){
+                new_buns = min(F_mate,M_mate);
+                cout << "New Round of " << new_buns << " bunnies!" << endl;
+            }
+            while(new_buns>=1){
+                new_buns--;
+                AddBun(x);
+            }
+        }
     }
 }
 
-// void Bunny::FemalePopulation(){
-//     if (this->getGender() == "female"){
-//         F_pop++;
-//     }
-// }
+// void BunnyList::BunnyMates(){
+//     cout << "here" << endl;
+//     numCalls++;
+//     double x = randlcg(numCalls);
+//     int new_buns = 0;
+//     if(head){
+//         Bunny* temp = head;
+//         while(temp !=NULL){
 //
-// void Bunny::BunnyMates(){
-//     if (this->getGender() == "male"){
-//         M_pop++;
+//         }
 //     }
-//
+
 // }
 
+// void MutantConversion(){
+//
+// }
+//
+// void BunnyPopulation(){
+//
+// }
+//
+// void MutantPopulation(){
+//
+// }
 
 int main(){
-    int numCalls = 0;
-    double x = randlcg(numCalls);
-    cout << "x=" << x << endl;
+    double x = randlcg();
     //Bunny instanceBun = Bunny(x);
     BunnyList * PeskyWabbits = new BunnyList;
 
     //Use the pointer to the BunnyList PeskyWabbits to add the first 10 bunnies to the list and start
     //tracking their age
-    PeskyWabbits->OriginalList(numCalls);
+    while(numCalls<10){
+        numCalls++;
+        PeskyWabbits->OriginalList();
+    }
+    bool terminate = false;
+    while(!terminate){
+        //Increment age
+        PeskyWabbits -> incrementAge();
+
+        //Add Bunnies
+        PeskyWabbits->BunnyMates();
+
+        // //Convert to Mutant bunnies
+        // PeskyWabbits->MutantConversion();
+        //
+        // //See if the size is 0
+        // PeskyWabbits->BunnyPopulation();
+
+    }
+
+
+    cout << "f=" << F_pop << endl;
 
     //For each male/female pair age 2-8 years: a new bunny is created in turn
 
@@ -338,69 +453,3 @@ int main(){
 return(0);
 
 }
-
-//Use a pointer to access the age characteristic in the bunny type
-// start->age = start->age+1;
-// start = start->next;
-
-//initialize the first 10 bunnies
-// while(numCalls<10){
-//     cout << "here" << endl;
-//     instanceBun.getMutant(0);
-//     instanceBun.printBunny();
-// }
-
-// double x=randlcg(numCalls);
-// numCalls++;
-//
-// //find the gender
-// x=randlcg(numCalls);
-// cout << x << endl;
-// string gender = AllBuns.getGender(x);
-// cout << gender << endl;
-//
-// //find and assign the color
-// string color = AllBuns.getColor(x);
-// cout << color << endl;
-//
-// //find and assign the name
-// string name = AllBuns.getName(x);
-// cout << name << endl;
-// bool mutant = AllBuns.getMutant(x);
-// if (mutant==true){
-//     cout << "Mutant" << endl;
-// }
-//
-// int age=0;
-//
-//
-// Bunny* CurrentBunny = MakeBunny(gender, color, name, age, mutant);
-// //cout << OriginalBuns << endl;
-
-// //Make initial 10 bunny list
-// void OriginalList::BunnyList(int numCalls) {
-//     cout << "numCalls" << numCalls << endl;
-//     if(numCalls == 0)
-//     cout << "again" << endl;
-//     {
-//         for(int i=0; i<10; i++){
-//             numCalls++;
-//             double x = randlcg(numCalls);
-//             this->AddBun(x);
-//             cout << "x " << x << endl;
-//             cout << "numCalls: " << numCalls << endl;
-//         }
-//     }
-//
-//
-
-// while(size){
-//     numCalls++;
-//     double x = randlcg(numCalls);
-//     this->AddBun(x);
-//     cout << "x " << x << endl;
-//     cout << "numCalls: " << numCalls << endl;
-//     //incrementAge adds a year to the bunnies that are still alive and kills the bunnies that are past
-//     //their mortality
-//     this->incrementAge();
-// }

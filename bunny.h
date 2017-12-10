@@ -82,7 +82,7 @@ public:
     //Destructor
     //~BunnyList();
 
-    void OriginalList(int numCalls);
+    void OriginalList();
 
     void BunnyPop(bool& terminate);
 
@@ -93,9 +93,12 @@ public:
 
     void BunnyMates();
 
-    // void FemalePopulation();
-    //
-    // void MalePopulation();
+    bool ageCheck(Bunny* instance);
 
-    void MutantPopulation();
+    // void MutantConversion();
+    //
+    // void BunnyPopulation();
+    //
+    // void MutantPopulation();
+
 };
